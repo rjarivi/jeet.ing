@@ -20,6 +20,7 @@ const App = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [formStatus, setFormStatus] = useState('idle');
+  const [activeTab, setActiveTab] = useState('buy');
 
   const containerRef = useRef(null);
   const storyRef = useRef(null);
@@ -395,82 +396,162 @@ const App = () => {
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="bg-[#0d0d0d] p-8 md:p-20 rounded-[3rem] md:rounded-[4rem] border border-white/5 relative shadow-2xl overflow-hidden group min-h-[500px] flex flex-col justify-center"
+                className="bg-[#0d0d0d] rounded-[3rem] md:rounded-[4rem] border border-white/5 relative shadow-2xl overflow-hidden group min-h-[600px] flex flex-col"
               >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 blur-[120px] rounded-full" />
 
-                <AnimatePresence mode="wait">
-                  {formStatus === 'success' ? (
-                    <motion.div
-                      key="success"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="py-16 text-center space-y-6"
-                    >
-                      <div className="w-24 h-24 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_rgba(79,70,229,0.4)]">
-                        <ShieldCheck size={48} />
-                      </div>
-                      <h3 className="text-3xl md:text-4xl font-black tracking-tight">Request Logged.</h3>
-                      <p className="text-white/40 text-base md:text-lg">Our digital asset manager will respond via encrypted channel shortly.</p>
-                      <button
-                        onClick={() => setFormStatus('idle')}
-                        className="text-[10px] text-indigo-400 underline tracking-[0.2em] uppercase hover:text-white transition-colors"
+                {/* Tab Switcher */}
+                <div className="flex border-b border-white/5 relative z-10">
+                  <button
+                    onClick={() => setActiveTab('buy')}
+                    onMouseEnter={() => setIsHovering(true)}
+                    onMouseLeave={() => setIsHovering(false)}
+                    className={`flex-1 py-8 text-[10px] md:text-xs font-black uppercase tracking-[0.4em] transition-all duration-500 relative ${activeTab === 'buy' ? 'text-white' : 'text-white/20 hover:text-white/40'}`}
+                  >
+                    01 // Buy Now
+                    {activeTab === 'buy' && (
+                      <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-1 bg-indigo-500" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('inquiry')}
+                    onMouseEnter={() => setIsHovering(true)}
+                    onMouseLeave={() => setIsHovering(false)}
+                    className={`flex-1 py-8 text-[10px] md:text-xs font-black uppercase tracking-[0.4em] transition-all duration-500 relative ${activeTab === 'inquiry' ? 'text-white' : 'text-white/20 hover:text-white/40'}`}
+                  >
+                    02 // Inquire
+                    {activeTab === 'inquiry' && (
+                      <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-1 bg-indigo-500" />
+                    )}
+                  </button>
+                </div>
+
+                <div className="p-8 md:p-16 flex-1 flex flex-col justify-center relative z-10">
+                  <AnimatePresence mode="wait">
+                    {activeTab === 'buy' ? (
+                      <motion.div
+                        key="buy-tab"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="space-y-10"
                       >
-                        New Inquiry
-                      </button>
-                    </motion.div>
-                  ) : (
-                    <motion.form
-                      key="form"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      onSubmit={handleContact}
-                      className="space-y-8 md:space-y-10"
-                    >
-                      <div className="space-y-2">
-                        <label className="text-[10px] uppercase tracking-[0.4em] opacity-30 ml-2 font-bold">Inquiry Email</label>
-                        <input
-                          required
-                          type="email"
-                          name="email"
-                          placeholder="ceo@venture.capital"
-                          className="w-full bg-transparent border-b border-white/10 px-4 py-4 md:py-6 focus:outline-none focus:border-indigo-500 transition-all text-lg md:text-xl font-light placeholder:text-white/30"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] uppercase tracking-[0.4em] opacity-30 ml-2 font-bold">Acquisition Offer (USD)</label>
-                        <input
-                          required
-                          type="text"
-                          name="offer"
-                          placeholder="Minimum $5,000"
-                          className="w-full bg-transparent border-b border-white/10 px-4 py-4 md:py-6 focus:outline-none focus:border-indigo-500 transition-all text-lg md:text-xl font-light placeholder:text-white/30"
-                        />
-                      </div>
-                      <button
-                        disabled={formStatus === 'sending'}
-                        className="w-full bg-white text-black py-6 md:py-8 rounded-[1.5rem] md:rounded-[2rem] font-black text-[10px] md:text-xs uppercase tracking-[0.5em] hover:bg-indigo-600 hover:text-white transition-all duration-500 flex items-center justify-center gap-4 group shadow-xl disabled:opacity-50"
-                        onMouseEnter={() => setIsHovering(true)}
-                        onMouseLeave={() => setIsHovering(false)}
-                      >
-                        {formStatus === 'sending' ? (
-                          <>
-                            <Loader2 className="animate-spin" size={18} />
-                            ESTABLISHING_LINK...
-                          </>
-                        ) : (
-                          <>
-                            INITIATE_TRANSFER
+                        <div className="space-y-6">
+                          <h3 className="text-3xl md:text-4xl font-black tracking-tight">Instant Acquisition.</h3>
+                          <p className="text-white/40 text-lg font-light leading-relaxed">
+                            Secure JEET.ING immediately through our verified marketplace partner. All transfers are handled via secure escrow.
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                          <a
+                            href="https://www.spaceship.com/domain-search/?query=jeet.ing&beast=false&tab=domains"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onMouseEnter={() => setIsHovering(true)}
+                            onMouseLeave={() => setIsHovering(false)}
+                            className="flex items-center justify-center gap-4 bg-white text-black py-6 md:py-8 rounded-[1.5rem] md:rounded-[2rem] font-black text-[10px] md:text-xs uppercase tracking-[0.5em] hover:bg-indigo-600 hover:text-white transition-all duration-500 group shadow-xl"
+                          >
+                            Buy Now ($1,500)
                             <ArrowRight size={18} className="group-hover:translate-x-3 transition-transform duration-500" />
-                          </>
+                          </a>
+
+                          <a
+                            href="https://www.spaceship.com/domain-search/?query=jeet.ing&beast=false&tab=domains"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onMouseEnter={() => setIsHovering(true)}
+                            onMouseLeave={() => setIsHovering(false)}
+                            className="flex items-center justify-center gap-4 bg-white/5 border border-white/10 text-white py-6 md:py-8 rounded-[1.5rem] md:rounded-[2rem] font-black text-[10px] md:text-xs uppercase tracking-[0.5em] hover:bg-white/10 transition-all duration-500"
+                          >
+                            Make Offer
+                          </a>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-6 opacity-20">
+                          <div className="text-[10px] font-mono tracking-widest">SPACESHIP</div>
+                          <div className="w-1 h-1 rounded-full bg-white" />
+                          <div className="text-[10px] font-mono tracking-widest">AFTERNIC</div>
+                          <div className="w-1 h-1 rounded-full bg-white" />
+                          <div className="text-[10px] font-mono tracking-widest">ESCROW.COM</div>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <div className="w-full">
+                        {formStatus === 'success' ? (
+                          <motion.div
+                            key="success"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="text-center space-y-6"
+                          >
+                            <div className="w-24 h-24 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_rgba(79,70,229,0.4)]">
+                              <ShieldCheck size={48} />
+                            </div>
+                            <h3 className="text-3xl md:text-4xl font-black tracking-tight">Request Logged.</h3>
+                            <p className="text-white/40 text-base md:text-lg">Our digital asset manager will respond via encrypted channel shortly.</p>
+                            <button
+                              onClick={() => setFormStatus('idle')}
+                              className="text-[10px] text-indigo-400 underline tracking-[0.2em] uppercase hover:text-white transition-colors"
+                            >
+                              New Inquiry
+                            </button>
+                          </motion.div>
+                        ) : (
+                          <motion.form
+                            key="form"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            onSubmit={handleContact}
+                            className="space-y-8"
+                          >
+                            <div className="space-y-2">
+                              <label className="text-[10px] uppercase tracking-[0.4em] opacity-30 ml-2 font-bold">Inquiry Email</label>
+                              <input
+                                required
+                                type="email"
+                                name="email"
+                                placeholder="ceo@venture.capital"
+                                className="w-full bg-transparent border-b border-white/10 px-4 py-4 md:py-6 focus:outline-none focus:border-indigo-500 transition-all text-lg md:text-xl font-light placeholder:text-white/30"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[10px] uppercase tracking-[0.4em] opacity-30 ml-2 font-bold">Acquisition Offer (USD)</label>
+                              <input
+                                required
+                                type="text"
+                                name="offer"
+                                placeholder="Minimum $5,000"
+                                className="w-full bg-transparent border-b border-white/10 px-4 py-4 md:py-6 focus:outline-none focus:border-indigo-500 transition-all text-lg md:text-xl font-light placeholder:text-white/30"
+                              />
+                            </div>
+                            <button
+                              disabled={formStatus === 'sending'}
+                              className="w-full bg-white text-black py-6 md:py-8 rounded-[1.5rem] md:rounded-[2rem] font-black text-[10px] md:text-xs uppercase tracking-[0.5em] hover:bg-indigo-600 hover:text-white transition-all duration-500 flex items-center justify-center gap-4 group shadow-xl disabled:opacity-50"
+                              onMouseEnter={() => setIsHovering(true)}
+                              onMouseLeave={() => setIsHovering(false)}
+                            >
+                              {formStatus === 'sending' ? (
+                                <>
+                                  <Loader2 className="animate-spin" size={18} />
+                                  ESTABLISHING_LINK...
+                                </>
+                              ) : (
+                                <>
+                                  INITIATE_TRANSFER
+                                  <ArrowRight size={18} className="group-hover:translate-x-3 transition-transform duration-500" />
+                                </>
+                              )}
+                            </button>
+                            <p className="text-[8px] md:text-[10px] text-center opacity-20 uppercase tracking-[0.3em] leading-relaxed">Official purchase, escrow clearance via spaceship.com</p>
+                          </motion.form>
                         )}
-                      </button>
-                      <p className="text-[8px] md:text-[10px] text-center opacity-20 uppercase tracking-[0.3em] leading-relaxed">Official escrow clearance via Escrow.com / Sedo / Afternic protocol</p>
-                    </motion.form>
-                  )}
-                </AnimatePresence>
+                      </div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </motion.div>
             </div>
 
