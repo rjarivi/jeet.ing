@@ -23,9 +23,17 @@ const App = () => {
 
   const containerRef = useRef(null);
   const storyRef = useRef(null);
+  const acquireRef = useRef(null);
 
   const { scrollYProgress } = useScroll();
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+  // Header opacity - hide when reaching acquisition section
+  const { scrollYProgress: acquireProgress } = useScroll({
+    target: acquireRef,
+    offset: ["start end", "start start"]
+  });
+  const headerOpacity = useTransform(acquireProgress, [0, 0.5, 1], [1, 0.5, 0]);
 
   // Main story scroll
   const { scrollYProgress: storyProgress } = useScroll({
@@ -110,7 +118,10 @@ const App = () => {
       </motion.div>
 
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 mix-blend-difference flex justify-between items-center p-6 md:p-12 lg:px-16">
+      <motion.nav
+        className="fixed top-0 w-full z-50 mix-blend-difference flex justify-between items-center p-6 md:p-12 lg:px-16"
+        style={{ opacity: headerOpacity }}
+      >
         <motion.div
           className="text-lg md:text-xl font-bold tracking-tight cursor-pointer flex items-center gap-1 group"
           whileHover={{ scale: 1.05 }}
@@ -133,7 +144,7 @@ const App = () => {
         >
           SIGNAL: <motion.span>{useTransform(smoothProgress, (v) => Math.round(v * 100))}</motion.span>%
         </motion.div>
-      </nav>
+      </motion.nav>
 
       <main className="relative">
 
@@ -359,117 +370,119 @@ const App = () => {
           </div>
         </section>
 
-        {/* Acquisition */}
-        <section className="relative min-h-screen py-32 flex flex-col items-center justify-center bg-black px-6" id="acquire">
-          <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-20 md:gap-32 items-center">
+        {/* Acquisition - Sticky section with extended scroll */}
+        <section ref={acquireRef} className="relative h-[200vh] bg-black" id="acquire">
+          <div className="sticky top-0 min-h-screen py-32 flex flex-col items-center justify-center bg-black px-6">
+            <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-20 md:gap-32 items-center">
 
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="space-y-12 md:space-y-16"
-            >
-              <h2 className="text-6xl md:text-[8rem] font-black tracking-tighter leading-[0.85]">Become <br />The Owner.</h2>
-              <p className="text-white/40 text-xl md:text-2xl max-w-lg font-light leading-relaxed">
-                Jeet.ing is not a purchase; it is a strategic positioning. Command the narrative of victory in the digital age.
-              </p>
-              <div className="flex flex-col gap-6 md:gap-8 font-mono text-[10px] md:text-[11px] text-indigo-400 tracking-widest">
-                <div className="flex items-center gap-4"><div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.5)]" /> STATUS: OPEN_NEGOTIATION</div>
-                <div className="flex items-center gap-4"><div className="w-2.5 h-2.5 rounded-full bg-white/20" /> LISTING: PREMIUM_4L_ACTION</div>
-              </div>
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="space-y-12 md:space-y-16"
+              >
+                <h2 className="text-6xl md:text-[8rem] font-black tracking-tighter leading-[0.85]">Become <br />The Owner.</h2>
+                <p className="text-white/40 text-xl md:text-2xl max-w-lg font-light leading-relaxed">
+                  Jeet.ing is not a purchase; it is a strategic positioning. Command the narrative of victory in the digital age.
+                </p>
+                <div className="flex flex-col gap-6 md:gap-8 font-mono text-[10px] md:text-[11px] text-indigo-400 tracking-widest">
+                  <div className="flex items-center gap-4"><div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.5)]" /> STATUS: OPEN_NEGOTIATION</div>
+                  <div className="flex items-center gap-4"><div className="w-2.5 h-2.5 rounded-full bg-white/20" /> LISTING: PREMIUM_4L_ACTION</div>
+                </div>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="bg-[#0d0d0d] p-8 md:p-20 rounded-[3rem] md:rounded-[4rem] border border-white/5 relative shadow-2xl overflow-hidden group min-h-[500px] flex flex-col justify-center"
-            >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 blur-[120px] rounded-full" />
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="bg-[#0d0d0d] p-8 md:p-20 rounded-[3rem] md:rounded-[4rem] border border-white/5 relative shadow-2xl overflow-hidden group min-h-[500px] flex flex-col justify-center"
+              >
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 blur-[120px] rounded-full" />
 
-              <AnimatePresence mode="wait">
-                {formStatus === 'success' ? (
-                  <motion.div
-                    key="success"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="py-16 text-center space-y-6"
-                  >
-                    <div className="w-24 h-24 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_rgba(79,70,229,0.4)]">
-                      <ShieldCheck size={48} />
-                    </div>
-                    <h3 className="text-3xl md:text-4xl font-black tracking-tight">Request Logged.</h3>
-                    <p className="text-white/40 text-base md:text-lg">Our digital asset manager will respond via encrypted channel shortly.</p>
-                    <button
-                      onClick={() => setFormStatus('idle')}
-                      className="text-[10px] text-indigo-400 underline tracking-[0.2em] uppercase hover:text-white transition-colors"
+                <AnimatePresence mode="wait">
+                  {formStatus === 'success' ? (
+                    <motion.div
+                      key="success"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="py-16 text-center space-y-6"
                     >
-                      New Inquiry
-                    </button>
-                  </motion.div>
-                ) : (
-                  <motion.form
-                    key="form"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onSubmit={handleContact}
-                    className="space-y-8 md:space-y-10"
-                  >
-                    <div className="space-y-2">
-                      <label className="text-[10px] uppercase tracking-[0.4em] opacity-30 ml-2 font-bold">Inquiry Email</label>
-                      <input
-                        required
-                        type="email"
-                        name="email"
-                        placeholder="ceo@venture.capital"
-                        className="w-full bg-transparent border-b border-white/10 px-4 py-4 md:py-6 focus:outline-none focus:border-indigo-500 transition-all text-lg md:text-xl font-light placeholder:text-white/30"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] uppercase tracking-[0.4em] opacity-30 ml-2 font-bold">Acquisition Offer (USD)</label>
-                      <input
-                        required
-                        type="text"
-                        name="offer"
-                        placeholder="Minimum $5,000"
-                        className="w-full bg-transparent border-b border-white/10 px-4 py-4 md:py-6 focus:outline-none focus:border-indigo-500 transition-all text-lg md:text-xl font-light placeholder:text-white/30"
-                      />
-                    </div>
-                    <button
-                      disabled={formStatus === 'sending'}
-                      className="w-full bg-white text-black py-6 md:py-8 rounded-[1.5rem] md:rounded-[2rem] font-black text-[10px] md:text-xs uppercase tracking-[0.5em] hover:bg-indigo-600 hover:text-white transition-all duration-500 flex items-center justify-center gap-4 group shadow-xl disabled:opacity-50"
-                      onMouseEnter={() => setIsHovering(true)}
-                      onMouseLeave={() => setIsHovering(false)}
+                      <div className="w-24 h-24 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_rgba(79,70,229,0.4)]">
+                        <ShieldCheck size={48} />
+                      </div>
+                      <h3 className="text-3xl md:text-4xl font-black tracking-tight">Request Logged.</h3>
+                      <p className="text-white/40 text-base md:text-lg">Our digital asset manager will respond via encrypted channel shortly.</p>
+                      <button
+                        onClick={() => setFormStatus('idle')}
+                        className="text-[10px] text-indigo-400 underline tracking-[0.2em] uppercase hover:text-white transition-colors"
+                      >
+                        New Inquiry
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <motion.form
+                      key="form"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onSubmit={handleContact}
+                      className="space-y-8 md:space-y-10"
                     >
-                      {formStatus === 'sending' ? (
-                        <>
-                          <Loader2 className="animate-spin" size={18} />
-                          ESTABLISHING_LINK...
-                        </>
-                      ) : (
-                        <>
-                          INITIATE_TRANSFER
-                          <ArrowRight size={18} className="group-hover:translate-x-3 transition-transform duration-500" />
-                        </>
-                      )}
-                    </button>
-                    <p className="text-[8px] md:text-[10px] text-center opacity-20 uppercase tracking-[0.3em] leading-relaxed">Official escrow clearance via Escrow.com / Sedo / Afternic protocol</p>
-                  </motion.form>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          </div>
-
-          <footer className="w-full max-w-7xl border-t border-white/5 mt-32 md:mt-40 py-12 md:py-16 flex flex-col md:flex-row justify-between items-center text-[9px] md:text-[10px] uppercase tracking-[0.4em] opacity-20 font-bold gap-8 md:gap-0">
-            <div>&copy; 2026 JEET.ING ASSET MGMT</div>
-            <div className="flex gap-8 md:gap-16">
-              <a href="#" className="hover:text-white transition-colors">Portfolios</a>
-              <a href="#" className="hover:text-white transition-colors">Compliance</a>
-              <a href="#" className="hover:text-white transition-colors">Network</a>
+                      <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-[0.4em] opacity-30 ml-2 font-bold">Inquiry Email</label>
+                        <input
+                          required
+                          type="email"
+                          name="email"
+                          placeholder="ceo@venture.capital"
+                          className="w-full bg-transparent border-b border-white/10 px-4 py-4 md:py-6 focus:outline-none focus:border-indigo-500 transition-all text-lg md:text-xl font-light placeholder:text-white/30"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-[0.4em] opacity-30 ml-2 font-bold">Acquisition Offer (USD)</label>
+                        <input
+                          required
+                          type="text"
+                          name="offer"
+                          placeholder="Minimum $5,000"
+                          className="w-full bg-transparent border-b border-white/10 px-4 py-4 md:py-6 focus:outline-none focus:border-indigo-500 transition-all text-lg md:text-xl font-light placeholder:text-white/30"
+                        />
+                      </div>
+                      <button
+                        disabled={formStatus === 'sending'}
+                        className="w-full bg-white text-black py-6 md:py-8 rounded-[1.5rem] md:rounded-[2rem] font-black text-[10px] md:text-xs uppercase tracking-[0.5em] hover:bg-indigo-600 hover:text-white transition-all duration-500 flex items-center justify-center gap-4 group shadow-xl disabled:opacity-50"
+                        onMouseEnter={() => setIsHovering(true)}
+                        onMouseLeave={() => setIsHovering(false)}
+                      >
+                        {formStatus === 'sending' ? (
+                          <>
+                            <Loader2 className="animate-spin" size={18} />
+                            ESTABLISHING_LINK...
+                          </>
+                        ) : (
+                          <>
+                            INITIATE_TRANSFER
+                            <ArrowRight size={18} className="group-hover:translate-x-3 transition-transform duration-500" />
+                          </>
+                        )}
+                      </button>
+                      <p className="text-[8px] md:text-[10px] text-center opacity-20 uppercase tracking-[0.3em] leading-relaxed">Official escrow clearance via Escrow.com / Sedo / Afternic protocol</p>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
-          </footer>
+
+            <footer className="w-full max-w-7xl border-t border-white/5 mt-32 md:mt-40 py-12 md:py-16 flex flex-col md:flex-row justify-between items-center text-[9px] md:text-[10px] uppercase tracking-[0.4em] opacity-20 font-bold gap-8 md:gap-0">
+              <div>&copy; 2026 JEET.ING ASSET MGMT</div>
+              <div className="flex gap-8 md:gap-16">
+                <a href="#" className="hover:text-white transition-colors">Portfolios</a>
+                <a href="#" className="hover:text-white transition-colors">Compliance</a>
+                <a href="#" className="hover:text-white transition-colors">Network</a>
+              </div>
+            </footer>
+          </div>
         </section>
       </main>
 
