@@ -8,7 +8,8 @@ import {
   TrendingUp,
   Lock,
   Compass,
-  Loader2
+  Loader2,
+  ArrowDown
 } from 'lucide-react';
 import marketImg from './assets/market_intelligence.png';
 import proGamingImg from './assets/pro_gaming.png';
@@ -158,6 +159,21 @@ const App = () => {
               style={{ opacity: introOpacity, scale: introScale }}
               className="absolute inset-0 flex flex-col items-center justify-center text-center px-4"
             >
+              <div className="mb-8 md:mb-12 flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full backdrop-blur-md">
+                <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                <span className="text-[9px] md:text-[10px] font-mono uppercase tracking-[0.2em] text-white/70">Premium Domain Available</span>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="flex flex-col items-center gap-2 mb-2 md:mb-4 text-indigo-400"
+              >
+                <span className="text-[10px] md:text-sm font-mono italic tracking-widest">This could be your domain</span>
+                <ArrowDown size={14} className="animate-bounce" />
+              </motion.div>
+
               <h1 className="text-[15vw] md:text-[18vw] font-black leading-none tracking-tight flex items-center justify-center" style={{ letterSpacing: '0.02em' }}>
                 JEET
                 <motion.span
@@ -168,9 +184,19 @@ const App = () => {
                 </motion.span>
                 <span className="opacity-30">ING</span>
               </h1>
-              <p className="mt-8 text-[10px] md:text-sm tracking-[0.5em] uppercase opacity-40 font-light">
+              <p className="mt-8 text-[10px] md:text-sm tracking-[0.5em] uppercase opacity-40 font-light max-w-lg mx-auto leading-relaxed">
                 The Science of Winning Continuous
               </p>
+
+              <motion.a
+                href="#acquire"
+                className="mt-12 group flex items-center gap-3 border-b border-indigo-500 pb-1 text-indigo-400 text-[10px] md:text-xs font-black uppercase tracking-[0.3em] hover:text-white hover:border-white transition-all z-20"
+                whileHover={{ scale: 1.05 }}
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+              >
+                Acquire This Asset <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </motion.a>
             </motion.div>
 
             {/* Chapter 3: Etymology - Sanskrit */}
